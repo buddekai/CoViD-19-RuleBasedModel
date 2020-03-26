@@ -1,41 +1,53 @@
 # Rule-based general SIR model
 
-See [directory SIRmodel](./SIRmodel) for more information. The model is based upon the ODE model shown in https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology#The_SIR_model.
+This model is based upon the ODE model shown in https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology#The_SIR_model, which was published by Kermack and McKendrick in 1927 (https://doi.org/10.1098/rspa.1927.0118).
 
 ## General ODE-based SIR model
-The most general model for an epidemic or pandemic is the SIR model with the following three equations:
+The most general model of a disease that spreads very fast (resulting in an epidemic or even pandemic) is the SIR model comprising the following three equations:
 
-$$\frac{dS(t)}{dt} = - \frac{\beta}{N} S(t) I(t)$$
-$$\frac{dI(t)}{dt} =   \frac{\beta}{N} S(t) I(t) - \gamma I(t)$$
-$$\frac{dR(t)}{dt} =   \gamma I(t)$$
+<p align="center">
+![\frac{dS(t)}{dt} = - \frac{\beta}{N} S(t) I(t)](https://latex.codecogs.com/gif.latex?%5Cfrac%7BdS%28t%29%7D%7Bdt%7D%20%3D%20-%20%5Cfrac%7B%5Cbeta%7D%7BN%7D%20S%28t%29%20I%28t%29)
+![\frac{dI(t)}{dt} = \frac{\beta}{N} S(t) I(t) - \gamma I(t)](https://latex.codecogs.com/gif.latex?%5Cfrac%7BdI%28t%29%7D%7Bdt%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7BN%7D%20S%28t%29%20I%28t%29%20-%20%5Cgamma%20I%28t%29)
+![\frac{dR(t)}{dt} = \gamma I(t)](https://latex.codecogs.com/gif.latex?%5Cfrac%7BdR%28t%29%7D%7Bdt%7D%20%3D%20%5Cgamma%20I%28t%29)
+</p>
 
 with the entire population
 
-$$ N_\text{total} = S(t) + I(t) + R(t) =  const$$
+<p align="center">
+![N_\text{total} = S(t) + I(t) + R(t) = const](https://latex.codecogs.com/gif.latex?N_%5Ctext%7Btotal%7D%20%3D%20S%28t%29%20&plus;%20I%28t%29%20&plus;%20R%28t%29%20%3D%20const)
+</p>
 
 and the kinetic parameters
 
-$$ \beta = \frac{1}{\tau_C}$$
+<p align="center">
+![\beta = \frac{1}{\tau_C}](https://latex.codecogs.com/gif.latex?%5Cbeta%20%3D%20%5Cfrac%7B1%7D%7B%5Ctau_C%7D)
+</p>
 
 and
 
-$$ \gamma = \frac{1}{\tau_R}$$
+<p align="center">
+![\gamma = \frac{1}{\tau_R}](https://latex.codecogs.com/gif.latex?%5Cgamma%20%3D%20%5Cfrac%7B1%7D%7B%5Ctau_R%7D)
+</p>
 
 where
 
-$$$ \tau_C $$$
+<p align="center">
+![\tau_C](https://latex.codecogs.com/gif.latex?%5Ctau_C)
+</p>
 
 is the typical time between contacts and
 
-$$$ \tau_R $$$
+<p align="center">
+![\tau_R](https://latex.codecogs.com/gif.latex?%5Ctau_R)
+</p>
 
-is the typical time until recovery when infected.
+is the typical time until recovery when infected. We call
 
+<p align="center">
+![R_0 = \frac{\beta}{\gamma}](https://latex.codecogs.com/gif.latex?R_0%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cgamma%7D)
+</p>
 
-We call
-$$R_0 = \frac{\beta}{\gamma}$$
-
-the basic reproduction number or basic reproduction ratio. It shows how many people may be infected by one person.
+the basic reproduction number or basic reproduction ratio. It shows how many susceptible people may be infected by one infectious person.
 
 ## General rule-based SIR model
 
@@ -62,7 +74,8 @@ We now combine all rules with ```(beta / nTotal) * #s * #i``` as reaction rate a
 
 
 ### ML-Rules model version of general SIR model
-Together with the two rules, we can now build a ML-Rules version of the general SIR model. It can be found in [SIR.mlrj](.SIR.mlrj).
+Together with the two rules, we can now build a ML-Rules version of the general SIR model. It can be found in [SIR.mlrj](./SIR.mlrj).
 
-
+A sample simulation can be seen in the following screenshot of the ML-Rules editor.
+![SIR Model Simulation](./SIRsimulation.png)
 

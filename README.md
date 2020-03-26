@@ -1,6 +1,6 @@
 # Rule-based SIR models for CoViD-19
 
-One of the simplest models to simulate an outbreak of diseases such as the flu or measles is the SIR model. It models the transition of a population from being susceptible (S) to a disease to being infectious (I) and finally recovered (R). The model was first published in 1927 (https://doi.org/10.1098/rspa.1927.0118).
+One of the simplest models to simulate an outbreak of diseases such as the flu or measles is the SIR model. It models the transition of a population from being susceptible (S) to a disease to being infectious (I) and finally recovered (R). The model was first published by Kermack and McKendrick in 1927 (https://doi.org/10.1098/rspa.1927.0118).
 
 All models in this repository have been implemented for the rule-based modeling language ML-Rules (see https://doi.org/10.1145/2998499).
 
@@ -11,7 +11,7 @@ When the ML-Rules Sandbox is opened, you can simply load the model (*.mlrj), cho
 
 ## Available models:
 
- * Rule-based general SIR model (See directory [directory SIRmodel](./SIRmodel) for more information)
+ * Rule-based general SIR model (See [directory SIRmodel](./SIRmodel) for more information)
  * Rule-based CoViD-19 model from the Neher Lab
  * Rule-based SIR model for for CoViD-19
 
