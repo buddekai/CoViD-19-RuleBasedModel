@@ -1,0 +1,55 @@
+// General SIR model
+
+// Author: Kai Budde
+// Reference: https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology
+// Created: 2020/03/26
+// Last edited: 2020/03/26
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++ Species definitions (number of attributes) +++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+S();    // Susceptible
+I();    // Infected
+R();    // Recovered
+
+// ++++++++++++++++++++++++++++++++++
+// +++++ Initial species counts +++++
+// ++++++++++++++++++++++++++++++++++
+
+nS: 997;
+nI: 3;
+nR: 0;
+nTotal: nS + nI + nR;
+
+// +++++++++++++++++++++
+// +++++ Constants +++++
+// +++++++++++++++++++++
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++ Reaction rate coefficients / Model parameters +++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+beta:  0.4;   // in 1 / days
+gamma: 0.04;  // in 1 / days
+
+// ++++++++++++++++++++++++++++
+// +++++ Initial solution +++++
+// ++++++++++++++++++++++++++++
+
+>>INIT
+[
+   nS S() + nI I() + nR R()
+];
+
+// +++++++++++++++++++++++++++++++
+// +++++ Reaction rules ++++++++++
+// +++++++++++++++++++++++++++++++
+
+// R1: Infection of susceptible person
+S:s + I:i -> 2 I @ (beta / nTotal) * #s * #i;
+
+// R2: Recovery of infected person (recovered person is immune)
+I:i -> R @ gamma * #i;
