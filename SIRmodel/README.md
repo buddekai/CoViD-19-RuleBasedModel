@@ -17,6 +17,10 @@ with the entire population
 ![N_\text{total} = S(t) + I(t) + R(t) = const](https://latex.codecogs.com/svg.latex?N_%5Ctext%7Btotal%7D%20%3D%20S%28t%29%20&plus;%20I%28t%29%20&plus;%20R%28t%29%20%3D%20const)
 </p>
 
+<img src="https://latex.codecogs.com/gif.latex?N_%5Ctext%7Btotal%7D%20%3D%20S%28t%29%20&plus;%20I%28t%29%20&plus;%20R%28t%29%20%3D%20const">
+
+<img src="https://render.githubusercontent.com/render/math?math=N_\text{total} = S(t) + I(t) + R(t) = const">
+
 and the kinetic parameters
 
 <p align="center">
