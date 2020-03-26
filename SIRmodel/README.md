@@ -1,4 +1,4 @@
-# Rule-based general SIR model
+# Rule-based SIR model
 
 This model is based upon the ODE model shown in https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology#The_SIR_model, which was published by Kermack and McKendrick in 1927 (https://doi.org/10.1098/rspa.1927.0118).
 
@@ -14,7 +14,7 @@ The most general model of a disease that spreads very fast (resulting in an epid
 with the entire population
 
 <p align="center">
-![N_\text{total} = S(t) + I(t) + R(t) = const](https://latex.codecogs.com/gif.latex?N_%5Ctext%7Btotal%7D%20%3D%20S%28t%29%20&plus;%20I%28t%29%20&plus;%20R%28t%29%20%3D%20const)
+![N_\text{total} = S(t) + I(t) + R(t) = const](https://latex.codecogs.com/svg.latex?N_%5Ctext%7Btotal%7D%20%3D%20S%28t%29%20&plus;%20I%28t%29%20&plus;%20R%28t%29%20%3D%20const)
 </p>
 
 and the kinetic parameters
@@ -76,6 +76,6 @@ We now combine all rules with ```(beta / nTotal) * #s * #i``` as reaction rate a
 ### ML-Rules model version of general SIR model
 Together with the two rules, we can now build a ML-Rules version of the general SIR model. It can be found in [SIR.mlrj](./SIR.mlrj).
 
-A sample simulation can be seen in the following screenshot of the ML-Rules editor.
+A sample simulation can be seen in the following screenshot of the plot by the ML-Rules editor.
 ![SIR Model Simulation](./SIRsimulation.png)
 
