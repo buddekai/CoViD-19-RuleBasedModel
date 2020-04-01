@@ -6,52 +6,57 @@ This model is based upon the ODE model shown in https://en.wikipedia.org/wiki/Co
 The most general model of a disease that spreads very fast (resulting in an epidemic or even pandemic) is the SIR model comprising the following three equations:
 
 <p align="center">
-<!-- \frac{dS(t)}{dt} = - \frac{\beta}{N} S(t) I(t) -->
-<img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdS%28t%29%7D%7Bdt%7D%20%3D%20-%20%5Cfrac%7B%5Cbeta%7D%7BN%7D%20S%28t%29%20I%28t%29">
-<!-- \frac{dI(t)}{dt} = \frac{\beta}{N} S(t) I(t) - \gamma I(t) -->
-<img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdI%28t%29%7D%7Bdt%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7BN%7D%20S%28t%29%20I%28t%29%20-%20%5Cgamma%20I%28t%29">
-<!-- \frac{dR(t)}{dt} = \gamma I(t) -->
+1. The change in number of susceptible people:
+<!-- $$$\frac{dS(t)}{dt} = - \frac{\beta}{N_\text{total}} S(t) I(t)$$$ -->
+<img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdS%28t%29%7D%7Bdt%7D%20%3D%20-%20%5Cfrac%7B%5Cbeta%7D%7BN_%5Ctext%7Btotal%7D%7D%20S%28t%29%20I%28t%29">
+
+2. The change in number of infected people:
+<!-- $$$\frac{dI(t)}{dt} = \frac{\beta}{N_\text{total}} S(t) I(t) - \gamma I(t)$$$ -->
+<img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdI%28t%29%7D%7Bdt%7D%20%3D%20%5Cfrac%7B%5Cbeta%7D%7BN_%5Ctext%7Btotal%7D%7D%20S%28t%29%20I%28t%29%20-%20%5Cgamma%20I%28t%29">
+
+3. The change in number of recovered people:
+<!-- $$$\frac{dR(t)}{dt} = \gamma I(t)$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdR%28t%29%7D%7Bdt%7D%20%3D%20%5Cgamma%20I%28t%29">
 </p>
 
 with the entire population
 <p align="center">
-<!-- N_\text{total} = S(t) + I(t) + R(t) = const -->
+<!-- $$$N_\text{total} = S(t) + I(t) + R(t) = const$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?N_%5Ctext%7Btotal%7D%20%3D%20S%28t%29%20&plus;%20I%28t%29%20&plus;%20R%28t%29%20%3D%20const">
 </p>
 
 and the kinetic parameters
 
 <p align="center">
-<!-- [\beta = \frac{1}{\tau_C} -->
+<!-- $$$[\beta = \frac{1}{\tau_C}$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Cbeta%20%3D%20%5Cfrac%7B1%7D%7B%5Ctau_C%7D">
 </p>
 
 and
 
 <p align="center">
-<!-- \gamma = \frac{1}{\tau_R} -->
+<!-- $$$\gamma = \frac{1}{\tau_R}$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Cgamma%20%3D%20%5Cfrac%7B1%7D%7B%5Ctau_R%7D">
 </p>
 
 where
 
 <p align="center">
-<!-- \tau_C -->
+<!-- $$$\tau_C$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Ctau_C">
 </p>
 
 is the typical time between contacts and
 
 <p align="center">
-<!-- \tau_R -->
+<!-- $$$\tau_R$$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Ctau_R">
 </p>
 
 is the typical time until recovery when infected. We call
 
 <p align="center">
-<!-- R_0 = \frac{\beta}{\gamma} -->
+<!-- $$$R_0 = \frac{\beta}{\gamma}$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?R_0%20%3D%20%5Cfrac%7B%5Cbeta%7D%7B%5Cgamma%7D">
 </p>
 

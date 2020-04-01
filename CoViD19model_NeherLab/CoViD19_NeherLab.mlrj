@@ -1,0 +1,127 @@
+// CoViD-19 model by Neher Lab
+
+// Author: Neher et al. 2020
+// Translation to ML-Rules: Kai Budde
+// Reference: https://github.com/neherlab/covid19_scenarios
+// Created: 2020/03/30
+// Last edited: 2020/03/31
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++ Species definitions (number of attributes) +++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+S(string);    // Susceptible
+E(string);    // Exposed (infected but yet without symptoms)
+I(string);    // Infected (showing symptoms)
+R(string);    // Recovered
+H(string);    // Hospitalized
+C(string);    // Critical state
+D(string);    // Dead
+Time();       // Time in days
+Null();       // Null for start of clock
+
+
+// ++++++++++++++++++++++++++++++++++
+// +++++ Initial species counts +++++
+// ++++++++++++++++++++++++++++++++++
+
+nS_a: 980;   // Number of initially susceptible people
+nE_a: 10;    // Number of initially exposed people
+nI_a: 10;    // Number of initially infected people
+nR_a: 0;     // Number of initially recovered (immune) people
+nH_a: 0;     // Number of initially hospitalized people
+nC_a: 0;     // Number of initially hospitalized people in a critical state
+nD_a: 0;     // Number of initially dead people
+
+nTotal: nS_a + nE_a + nI_a + nR_a + nH_a + nC_a + nD_a;
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++ Reaction rate coefficients / Model parameters +++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Age related parameters
+// Group 'a' for test purposes: Age group 60-69 of Neher Lab Simulation model
+i_a: 0;       // isolation factor of age group 'a'
+m_a: 0.9;     // fraction of mild cases when infected
+c_a: 0.35;    // fraction of critical cases when hospitalized
+f_a: 0.4;     // fraction of fatal cases when critical
+
+// Basic parameters
+r_0: 3;       // basic reproduction number
+epsilon: 1;   // seasonal forcing: amplitude of seasonal variation in transmissibility
+t_max: 0;     // seasonal peak: time of the year of peak transmissibility
+severity: 2;  // Severity of ICU overflow: a multiplicative factor to death rate
+              // to patients that require but do not have access to an ICU bed
+              // relative to those who do.
+// TODO: Add severity factor to equation
+
+// Time parameters
+t_l: 5;       // latency: mean time for a transition between exposed and infected state [days]
+t_i: 3;       // infection period: mean time for a transition between infected and
+              // recovered / hospitalized state
+              // (in combination with m_a / (1-m_a), respectively) [days]
+t_h: 4;       // hospital stay: mean time for a transition between hopitalized and
+              // recovered / critical state
+              // (in combination with (1-c_a) / c_a, respectively) [days]
+t_c: 14;      // ICU stay: mean time for a transition between critical and
+              // hospitalized / dead state
+              // (in combination with (1-f_a) / f_a, respectively) [days]
+              
+// +++++++++++++++++++++
+// +++++ Functions +++++
+// +++++++++++++++++++++
+
+// Mitigation factor
+// Function (input: num (time), output: num (mitigation factor))
+// Right now: mitigation is a continuously decreasing function (m(t)=1/(t+1))
+m :: num -> num;
+m x = 1/(x+1);
+
+
+// Infection rate
+// Function (input: num (time), output: num (infection rate))
+beta_a :: num -> num;
+beta_a x = r_0 * i_a * m(x) * (1/t_i);
+// TODO: Add cosine
+
+// ++++++++++++++++++++++++++++
+// +++++ Initial solution +++++
+// ++++++++++++++++++++++++++++
+
+>>INIT
+[
+   nS_a S('a') + nE_a E('a') + nI_a I('a') + nR_a R('a')
+   + nH_a H('a') + nD_a D('a') + 0 Time + 1 Null
+];
+
+// +++++++++++++++++++++++++++++++
+// +++++ Reaction rules ++++++++++
+// +++++++++++++++++++++++++++++++
+
+// R0: Clock
+Null -> Null + Time @ 1;
+
+// R1: Infection of susceptible person but without symptoms at first
+S('a'):s + I(x):i + Time():t -> E('a') + I(x) + Time() @ (beta_a(#t) / nTotal) * #s * #i;
+// TODO: Something is wrong here!
+
+// R2: Infected person shows symptons and is infectious
+E('a'):e -> I('a') @ (1/t_l) * #e;
+
+// R3:Hospitalization of infected person
+I('a'):i -> H('a') @ (1/t_i) * (1-m_a) * #i;
+
+// R4: Recovery of infected person
+I('a'):i -> R('a') @ (1/t_i) * m_a * #i;
+
+// R5: Recovery of hospitalized person
+H('a'):h -> R('a') @ (1/t_h) * (1-c_a) * #h;
+
+// R6: Hospitalized person moves into critical state
+H('a'):h -> C('a') @ (1/t_h) * c_a * #h;
+
+// R7: Hospitalized person moves out of critical state
+C('a'):c -> H('a') @ (1/t_c) * (1-f_a) * #c;
+
+// R8: Hospitalized person dies
+C('a'):c -> D('a') @ (1/t_c) * f_a * #c;
