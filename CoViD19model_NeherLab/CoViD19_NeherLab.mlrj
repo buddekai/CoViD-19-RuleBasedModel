@@ -2,9 +2,10 @@
 
 // Author: Neher et al. 2020
 // Translation to ML-Rules: Kai Budde
+// Collaborator: Justin Kreikemeyer
 // Reference: https://github.com/neherlab/covid19_scenarios
 // Created: 2020/03/30
-// Last edited: 2020/03/31
+// Last edited: 2020/04/01
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++ Species definitions (number of attributes) +++++
@@ -41,7 +42,7 @@ nTotal: nS_a + nE_a + nI_a + nR_a + nH_a + nC_a + nD_a;
 
 // Age related parameters
 // Group 'a' for test purposes: Age group 60-69 of Neher Lab Simulation model
-i_a: 0;       // isolation factor of age group 'a'
+i_a: 1;       // isolation factor of age group 'a' (0: completely isolated to 1: not isolated)
 m_a: 0.9;     // fraction of mild cases when infected
 c_a: 0.35;    // fraction of critical cases when hospitalized
 f_a: 0.4;     // fraction of fatal cases when critical
@@ -81,7 +82,7 @@ m x = 1/(x+1);
 // Infection rate
 // Function (input: num (time), output: num (infection rate))
 beta_a :: num -> num;
-beta_a x = r_0 * (1 - i_a) * m(x) * (1/t_i);
+beta_a x = r_0 * i_a * m(x) * (1/t_i);
 // TODO: Add cosine
 
 // ++++++++++++++++++++++++++++
