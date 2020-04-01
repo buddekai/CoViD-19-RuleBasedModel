@@ -81,7 +81,7 @@ m x = 1/(x+1);
 // Infection rate
 // Function (input: num (time), output: num (infection rate))
 beta_a :: num -> num;
-beta_a x = r_0 * i_a * m(x) * (1/t_i);
+beta_a x = r_0 * (1 - i_a) * m(x) * (1/t_i);
 // TODO: Add cosine
 
 // ++++++++++++++++++++++++++++
@@ -103,7 +103,6 @@ Null -> Null + Time @ 1;
 
 // R1: Infection of susceptible person but without symptoms at first
 S('a'):s + I(x):i + Time():t -> E('a') + I(x) + Time() @ (beta_a(#t) / nTotal) * #s * #i;
-// TODO: Something is wrong here!
 
 // R2: Infected person shows symptons and is infectious
 E('a'):e -> I('a') @ (1/t_l) * #e;
