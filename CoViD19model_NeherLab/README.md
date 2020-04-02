@@ -6,6 +6,7 @@ This model is based upon the ODE model implemented by Richard Neher et al. The e
 The ordinary differential equations (ODEs) used by the Neher Lab for their CoViD-19 model are:
 
 <p align="center">
+
 1. The change in number of susceptible people for every age group
 <!-- $$$\frac{dS_a(t)}{dt} = - \frac{\beta_a(t)}{N_\text{total}} S_a(t) \sum_b I_b(t)$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7Bd%20S_a%28t%29%7D%7Bdt%7D%20%3D%20-%20%5Cfrac%7B%5Cbeta_a%28t%29%7D%7BN_%5Ctext%7Btotal%7D%7D%20S_a%28t%29%20%5Csum_b%20I_b%28t%29">
@@ -14,7 +15,7 @@ The ordinary differential equations (ODEs) used by the Neher Lab for their CoViD
 <!-- $$$\frac{dE_a(t)}{dt} = \frac{\beta_a(t)}{N_\text{total}} S_a(t) \sum_b I_b(t) - \frac{E_a(t)}{t_l}$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdE_a%28t%29%7D%7Bdt%7D%20%3D%20%5Cfrac%7B%5Cbeta_a%28t%29%7D%7BN_%5Ctext%7Btotal%7D%7D%20S_a%28t%29%20%5Csum_b%20I_b%28t%29%20-%20%5Cfrac%7BE_a%28t%29%7D%7Bt_l%7D">
 
-3. The change in number of infected people for every age group
+3. The change in number of infectious people for every age group
 <!-- $$$\\frac{dI_a(t)}{dt} = \frac{E_a(t)}{t_l} - \frac{I_a(t)}{t_i}$$$ -->
 <img src="https://latex.codecogs.com/gif.latex?%5Cfrac%7BdI_a%28t%29%7D%7Bdt%7D%20%3D%20%5Cfrac%7BE_a%28t%29%7D%7Bt_l%7D%20-%20%5Cfrac%7BI_a%28t%29%7D%7Bt_i%7D">
 

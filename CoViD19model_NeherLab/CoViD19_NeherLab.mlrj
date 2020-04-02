@@ -13,7 +13,7 @@
 
 S(string);    // Susceptible
 E(string);    // Exposed (infected but yet without symptoms)
-I(string);    // Infected (showing symptoms)
+I(string);    // Infectous
 R(string);    // Recovered
 H(string);    // Hospitalized
 C(string);    // Critical state
@@ -49,10 +49,11 @@ f_a: 0.4;     // fraction of fatal cases when critical
 
 // Basic parameters
 pi: 3.141592; // PI constant for use with the cosine function
-days_unit: 1; // Number of physical days for one unit of simulation time
+//days_unit: 1; // Number of physical days for one unit of simulation time <- all units are in days, therefore it's misleading to have a conversion factor
 r_0: 3;       // basic reproduction number
 epsilon: 1;   // seasonal forcing: amplitude of seasonal variation in transmissibility
-t_max: 0;     // seasonal peak: day of the year of peak transmissibility; TODO: make month like in original?
+t_max: 0;     // seasonal peak: day of the year of peak transmissibility (January 1)
+t_start: 73;  // Starting day of simulation (March 13, 2020)
 severity: 2;  // Severity of ICU overflow: a multiplicative factor to death rate
               // to patients that require but do not have access to an ICU bed
               // relative to those who do.
@@ -84,8 +85,7 @@ m x = 1/(x+1);
 // Infection rate
 // Function (input: num (time), output: num (infection rate))
 beta_a :: num -> num;
-beta_a x = r_0 * i_a * m(x) * (1 + epsilon * cos(2 * pi * (x * days_unit - t_max))) * (1/t_i);
-// TODO: Add cosine
+beta_a x = r_0 * i_a * m(x) * (1 + epsilon * cos(2 * pi * (x + t_start - t_max) / 365)) * (1/t_i);
 
 // ++++++++++++++++++++++++++++
 // +++++ Initial solution +++++
@@ -101,7 +101,7 @@ beta_a x = r_0 * i_a * m(x) * (1 + epsilon * cos(2 * pi * (x * days_unit - t_max
 // +++++ Reaction rules ++++++++++
 // +++++++++++++++++++++++++++++++
 
-// R0: Clock
+// R0: Clock (Time in days*100)
 Null -> Null + Time @ 100;
 
 // R1: Infection of susceptible person but without symptoms at first
