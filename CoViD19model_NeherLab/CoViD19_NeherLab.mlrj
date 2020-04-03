@@ -8,10 +8,10 @@
 // Last edited: 2020/04/03
 
 // Summary of TODO:
-// - Test severity implementation
 // - There is still a discrepancy between this and the original
 //   regarding the seasonal forcing
 // - Add imports per day
+// - Further comparisons with original
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++ Species definitions (number of attributes) +++++
@@ -32,7 +32,7 @@ Null();       // Null for start of clock
 // +++++ Initial species counts +++++
 // ++++++++++++++++++++++++++++++++++
 
-nS: 980;   // Number of initially susceptible people
+nS: 990;   // Number of initially susceptible people
 nE: 10;    // Number of initially exposed people
 nI: 0;     // Number of initially infected people
 nR: 0;     // Number of initially recovered (immune) people
@@ -112,7 +112,6 @@ severity: 2;  // Severity of ICU overflow: a multiplicative factor to death rate
               // to patients that require but do not have access to an ICU bed
               // relative to those who do.
 icu_beds: 10; // Total number of available ICU beds
-// TODO: Test severity function
 
 // Time parameters
 t_l: 5;       // latency: mean time for a transition between exposed and infected state [days]
