@@ -5,7 +5,7 @@
 // Collaborator: Justin Kreikemeyer
 // Reference: https://github.com/neherlab/covid19_scenarios
 // Created: 2020/03/30
-// Last edited: 2020/04/03
+// Last edited: 2020/04/14
 
 // Summary of TODO:
 // - There is still a discrepancy between this and the original
@@ -34,7 +34,7 @@ Null();       // Null for start of clock
 
 nS: 990;   // Number of initially susceptible people
 nE: 10;    // Number of initially exposed people
-nI: 0;     // Number of initially infected people
+nI: 0;     // Number of initially infectious people
 nR: 0;     // Number of initially recovered (immune) people
 nH: 0;     // Number of initially hospitalized people
 nC: 0;     // Number of initially hospitalized people in a critical state
@@ -47,7 +47,7 @@ nTotal: nS + nE + nI + nR + nH + nC + nD;
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // Age related parameters
-// The numbers refelct the defaults of the original model of Neher et al.
+// The numbers reflect the defaults of the original model of Neher et al.
 // Group 'a': Age group 0-9 of Neher Lab Simulation model
 i_a: 1;       // isolation factor of age group 'a' (0: completely isolated to 1: not isolated)
 m_a: 0.99;    // fraction of mild cases when infected
@@ -107,7 +107,7 @@ pi: 3.141592; // PI constant for use with the cosine function
 r_0: 3;       // basic reproduction number
 epsilon: 0;   // seasonal forcing: amplitude of seasonal variation in transmissibility
 t_max: 0;     // seasonal peak: day of the year of peak transmissibility (January 1)
-t_start: 73;  // Starting day of simulation (March 13, 2020 or day 73) 
+t_start: 73;  // Starting day of simulation (March 13, 2020 = 73rd day of the year 2020) 
 severity: 2;  // Severity of ICU overflow: a multiplicative factor to death rate
               // to patients that require but do not have access to an ICU bed
               // relative to those who do.
@@ -118,7 +118,7 @@ t_l: 5;       // latency: mean time for a transition between exposed and infecte
 t_i: 3;       // infection period: mean time for a transition between infected and
               // recovered / hospitalized state
               // (in combination with m_a / (1-m_a), respectively) [days]
-t_h: 4;       // hospital stay: mean time for a transition between hopitalized and
+t_h: 4;       // hospital stay: mean time for a transition between hospitalized and
               // recovered / critical state
               // (in combination with (1-c_a) / c_a, respectively) [days]
 t_c: 14;      // ICU stay: mean time for a transition between critical and
@@ -129,10 +129,12 @@ t_c: 14;      // ICU stay: mean time for a transition between critical and
 // +++++ Functions +++++
 // +++++++++++++++++++++
 
-// Helper Function to return a uniform distribution of a total of n Species s over 9 age classes
-// (input: n total number of instances of s, s name of the species; output: solution)
-uniform :: num -> string -> sol;
-uniform n s = 	
+
+// Helper function to return an equal distribution of a total of n species s
+// across 9 age groups (input: n total number of instances of s,
+// s name of the species; output: solution)
+equaldist :: num -> string -> sol;
+equaldist n s = 	
 	(n / 9)(s)('a') +
 	(n / 9)(s)('b') +
 	(n / 9)(s)('c') +
@@ -145,12 +147,13 @@ uniform n s =
 
 // ---- Population ----
 // Functions to create the initial populations for each species.
-// For S, an age distribution can be applied by passing the name of the area.
-// For everything else a uniform distribution is assumed.
+// For S (susceptible), an age distribution can be applied by passing the name of the area.
+// For everything else an equal distribution is assumed.
 
-// Generates initial S population. (input: name of the area that governs the age distribution;
-// output: solution of S with that age distribution). Currently only germany and none (uniform)
-// are supported.
+// Generates initial S population.
+// (input: name of the area that governs the age distribution;
+// output: solution of S with that age distribution).
+// Currently only 'Germany' and 'none' (equal distribution) are supported.
 susceptible :: string -> sol;
 // Values for Germany from the UNSD. See: https://github.com/neherlab/covid19_scenarios_data/blob/master/scripts/download_age_dists.py
 // {'Germany': {'0-9': 7880902, '10-19': 7930616, '20-29': 9377359, '30-39': 10872019, '40-49': 10243351, '50-59': 13488393, '60-69': 10644140, '70-79': 7471414, '80+': 5875748}}
@@ -165,25 +168,26 @@ susceptible 'germany' =
 	(0.127 * nS) S('g') +
 	(0.089 * nS) S('h') +
 	(0.07  * nS) S('i');
-susceptible 'none' = uniform(nS, name(S('')));
+susceptible 'none' = equaldist(nS, name(S('')));
+
 // Generates initial E population.
 exposed :: sol;
-exposed =	uniform(nE, name(E('')));
+exposed = equaldist(nE, name(E('')));
 // Generates initial I population.
 infected :: sol;
-infected =	 uniform(nI, name(I(''))); 
+infected =  equaldist(nI, name(I('')));
 // Generates initial R population.
 recovered :: sol;
-recovered =  uniform(nR, name(R(''))); 
+recovered = equaldist(nR, name(R('')));
 // Generates initial H population.
 hospitalized :: sol;
-hospitalized = uniform(nH, name(H(''))); 
+hospitalized = equaldist(nH, name(H('')));
 // Generates initial C population.
 critical :: sol;
-critical = uniform(nC, name(C(''))); 
+critical = equaldist(nC, name(C('')));
 // Generates initial D population.
 dead :: sol;
-dead = uniform(nD, name(D(''))); 
+dead = equaldist(nD, name(D('')));
 
 // ---- Age ----
 // Isolation Factor for each age group
@@ -245,7 +249,7 @@ mitigation x = 1; // no mitigation
 // Infection rate
 // Function (input: num (time), output: num (infection rate))
 beta :: string -> num -> num;
-beta a x = r_0 * i(a) * mitigation(x) * (1 + epsilon * cos(2 * pi * ((x + t_start) / 365 - t_max / 365))) * (1/t_i);
+beta a x = r_0 * i(a) * mitigation(x) * (1 + epsilon * cos(2 * pi * ((x + t_start - t_max) / 365))) * (1/t_i);
 // TODO: There is still some difference to Neherlab...
 
 // ++++++++++++++++++++++++++++
@@ -268,7 +272,7 @@ Null -> Null + Time @ 100;
 // R1: Infection of susceptible person but without symptoms at first
 S(a):s + I(x):i + Time():t -> E(a) + I(x) + Time() @ (beta(a,#t/100) / nTotal) * #s * #i;
 
-// R2: Infected person shows symptons and is infectious
+// R2: Infected person shows symptoms and is infectious
 E(a):e -> I(a) @ (1/t_l) * #e;
 
 // R3:Hospitalization of infected person
