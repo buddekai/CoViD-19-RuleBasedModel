@@ -1,0 +1,340 @@
+// CoViD-19 model by Neher Lab - Updated for Version 2
+
+// Author: Neher et al. 2020
+// Translation to ML-Rules: Kai Budde
+// Collaborator: Justin Kreikemeyer
+// Reference: https://github.com/neherlab/covid19_scenarios
+// Created: 2020/03/30
+// Last edited: 2020/04/30
+
+// Major changes (in comparison to version 1):
+// - implemented three stages for species E to achieve an Erlang distribution
+//   instead of an exponential one
+// - changed the parameters to closely resemble those of the original
+//   (e.g. m_a -> s_a, inverted i_a)
+// - added confirmed column for each age group
+// - randomized initial distributions
+
+// Summary of TODO:
+// - Add imports per day
+// - Test mitigation
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++ Species definitions (number of attributes) +++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+S(string);    // Susceptible
+E_1(string);  // Exposed (infected but yet without symptoms)
+E_2(string);  // different states to get an Erlang distribution  
+E_3(string);    
+I(string);    // Infectious
+R(string);    // Recovered
+H(string);    // Hospitalized
+C(string);    // Critical state
+D(string);    // Dead
+Bed();        // A single (virtual) ICU bed to compare to the real number of available beds
+Time();       // Time in days
+Null();       // Null for start of clock
+
+// ++++++++++++++++++++++++++++++++++
+// +++++ Initial species counts +++++
+// ++++++++++++++++++++++++++++++++++
+
+// The distribution of nS can be choosen to be the one of a specific country, random or uniform.
+// All other distributions will be randomized across age groups.
+// In the original the number of inital cases is split 0.3/0.7 between I/E
+
+nS: 83783902;   	// Number of initially susceptible people
+nE: 14;    	// Number of initially exposed people
+nI: 6;     	// Number of initially infected people
+nR: 0;     	// Number of initially recovered (immune) people
+nH: 0;     	// Number of initially hospitalized people
+nC: 0;     	// Number of initially hospitalized people in a critical state
+nD: 0;     	// Number of initially dead people
+
+nTotal: nS + nE + nI + nR + nH + nC + nD;
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++ Reaction rate coefficients / Model parameters +++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Age related parameters
+// The numbers refelct the defaults of the original model of Neher et al.
+// Group 'a': Age group 0-9 of Neher Lab Simulation model
+con_a: 0.05;  // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_a: 0;       // isolation factor of age group 'a' (1: completely isolated to 0: not isolated)
+s_a: 0.01;    // fraction of severe cases when infected
+c_a: 0.05;    // fraction of critical cases when hospitalized
+f_a: 0.3;     // fraction of fatal cases when critical
+
+// Group 'b': Age group 10-19 of Neher Lab Simulation model
+con_b: 0.05;  // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_b: 0;       // isolation factor of age group 'b' (1: completely isolated to 0: not isolated)
+s_b: 0.03;    // fraction of severe cases when infected
+c_b: 0.1;     // fraction of critical cases when hospitalized
+f_b: 0.3;     // fraction of fatal cases when critical
+
+// Group 'c': Age group 20-29 of Neher Lab Simulation model
+con_c: 0.1;   // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_c: 0;       // isolation factor of age group 'c' (1: completely isolated to 0: not isolated)
+s_c: 0.03;    // fraction of severe cases when infected
+c_c: 0.1;     // fraction of critical cases when hospitalized
+f_c: 0.3;     // fraction of fatal cases when critical
+
+// Group 'd': Age group 30-39 of Neher Lab Simulation model
+con_d: 0.15;  // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_d: 0;       // isolation factor of age group 'd' (1: completely isolated to 0: not isolated)
+s_d: 0.03;    // fraction of severe cases when infected
+c_d: 0.15;    // fraction of critical cases when hospitalized
+f_d: 0.3;     // fraction of fatal cases when critical
+
+// Group 'e': Age group 40-49 of Neher Lab Simulation model
+con_e: 0.2;   // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_e: 0;       // isolation factor of age group 'e' (1: completely isolated to 0: not isolated)
+s_e: 0.06;    // fraction of severe cases when infected
+c_e: 0.20;    // fraction of critical cases when hospitalized
+f_e: 0.3;     // fraction of fatal cases when critical
+
+// Group 'f': Age group 50-59 of Neher Lab Simulation model
+con_f: 0.25;  // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_f: 0;       // isolation factor of age group 'f' (1: completely isolated to 0: not isolated)
+s_f: 0.1;     // fraction of severe cases when infected
+c_f: 0.25;    // fraction of critical cases when hospitalized
+f_f: 0.4;     // fraction of fatal cases when critical
+
+// Group 'g': Age group 60-69 of Neher Lab Simulation model
+con_g: 0.3;   // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_g: 0;       // isolation factor of age group 'g' (1: completely isolated to 0: not isolated)
+s_g: 0.25;    // fraction of severe cases when infected
+c_g: 0.35;    // fraction of critical cases when hospitalized
+f_g: 0.4;     // fraction of fatal cases when critical
+
+// Group 'h': Age group 70-79 of Neher Lab Simulation model
+con_h: 0.4;   // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_h: 0;       // isolation factor of age group 'h' (1: completely isolated to 0: not isolated)
+s_h: 0.35;    // fraction of severe cases when infected
+c_h: 0.45;    // fraction of critical cases when hospitalized
+f_h: 0.5;     // fraction of fatal cases when critical
+
+// Group 'i': Age group 80+ of Neher Lab Simulation model
+con_i: 0.5;   // confirmed: fraction of cases that are reflected in the statistics used to derive m, c, and f
+i_i: 0;       // isolation factor of age group 'i' (1: completely isolated to 0: not isolated)
+s_i: 0.5;     // fraction of severe cases when infected
+c_i: 0.55;    // fraction of critical cases when hospitalized
+f_i: 0.5;     // fraction of fatal cases when critical
+
+// Basic parameters
+pi: 3.141592; // PI constant for use with the cosine function
+r_0: 3.6;     // basic reproduction number
+epsilon: 1.0;   // seasonal forcing: amplitude of seasonal variation in transmissibility
+t_max: 15.0;     // seasonal peak: day of the year of peak transmissibility (Jan 15, 2020 or day 15)
+t_start: 37.0;  // Starting day of simulation (Feb 06, 2020 or day 37) 
+severity: 2.0;  // Severity of ICU overflow: a multiplicative factor to death rate
+              // to patients that require but do not have access to an ICU bed
+              // relative to those who do.
+icu_beds: 23890; // Total number of available ICU beds
+
+// Time parameters
+t_l: 3.0;       // latency: mean time for a transition between exposed and infected state [days]
+t_i: 3.0;       // infection period: mean time for a transition between infected and
+              // recovered / hospitalized state
+              // (in combination with m_a / (1-m_a), respectively) [days]
+t_h: 3.0;       // hospital stay: mean time for a transition between hopitalized and
+              // recovered / critical state
+              // (in combination with (1-c_a) / c_a, respectively) [days]
+t_c: 14.0;      // ICU stay: mean time for a transition between critical and
+              // hospitalized / dead state
+              // (in combination with (1-f_a) / f_a, respectively) [days]
+              
+// +++++++++++++++++++++
+// +++++ Functions +++++
+// +++++++++++++++++++++
+
+// maps numbers 0-8 to age groups a-i
+// (input: number of age group; output: corresponding string)
+num_to_age :: num -> string;
+num_to_age 0 = 'a';
+num_to_age 1 = 'b';
+num_to_age 2 = 'c';
+num_to_age 3 = 'd';
+num_to_age 4 = 'e';
+num_to_age 5 = 'f';
+num_to_age 6 = 'g';
+num_to_age 7 = 'h';
+num_to_age 8 = 'i';
+
+// Returns a uniform distribution of a total of n Species s over 9 age classes
+// (input: n total number of instances of s, s name of the species; output: solution)
+uniform :: num -> string -> sol;
+uniform n s = 	
+	(n / 9.0)(s)('a') +
+	(n / 9.0)(s)('b') +
+	(n / 9.0)(s)('c') +
+	(n / 9.0)(s)('d') +
+	(n / 9.0)(s)('e') +
+	(n / 9.0)(s)('f') +
+	(n / 9.0)(s)('g') +
+	(n / 9.0)(s)('h') +
+	(n / 9.0)(s)('i');
+
+// returns a random distribution of n instances of species s over all age groups
+// (input: number of instances n, name of species s; output: solution of n instances of s
+//  with a random age distribution)
+random :: num -> string -> sol;
+random 0 s = [];
+random n s = (x)(s)(num_to_age(y)) + random(n-x,s)
+	where x = toInt(unif(0, n+1)),
+	      y = toInt(unif(0,9));
+
+// ---- Population ----
+// Functions to create the initial populations for each species.
+// For S, an age distribution can be applied by passing the name of the area, 'random' or 'uniform'.
+// For everything else a random distribution is assumed.
+
+// Generates initial S population. (input: name of the area that governs the age distribution;
+// output: solution of S with that age distribution). Currently only germany and none (uniform)
+// are supported.
+susceptible :: string -> sol;
+// Values for Germany from the UNSD. See: https://github.com/neherlab/covid19_scenarios_data/blob/master/scripts/download_age_dists.py
+// {'Germany': {'0-9': 7880902, '10-19': 7930616, '20-29': 9377359, '30-39': 10872019, '40-49': 10243351, '50-59': 13488393, '60-69': 10644140, '70-79': 7471414, '80+': 5875748}}
+// total: 83783942
+// Remark: The new version (2) of the original model now also contains these numbers for reference
+susceptible 'germany' = 
+	(0.094 * nS) S('a') + 
+	(0.095 * nS) S('b') +
+	(0.112 * nS) S('c') +
+	(0.13  * nS) S('d') +
+	(0.122 * nS) S('e') +
+	(0.161 * nS) S('f') +
+	(0.127 * nS) S('g') +
+	(0.089 * nS) S('h') +
+	(0.07  * nS) S('i');
+susceptible 'random' = random(nS, 'S');
+susceptible 'none' = uniform(nS, 'S');
+// Generates initial E population.
+exposed1 :: sol;
+exposed1 =	 random(nE, 'E_1') + uniform(0, 'E_1');
+exposed2 :: sol;
+exposed2 = uniform(0, 'E_2');
+exposed3 :: sol;
+exposed3 =	 uniform(0, 'E_3');
+// Generates initial I population.
+infected :: sol;
+infected =	 random(nI, 'I') + uniform(0, 'I');
+// Generates initial R population.
+recovered :: sol;
+recovered = random(nR, 'R') + uniform(0, 'R');
+// Generates initial H population.
+hospitalized :: sol;
+hospitalized = random(nH, 'H') + uniform(0, 'H');
+// Generates initial C population.
+critical :: sol;
+critical =  random(nC, 'C') + uniform(0, 'C');
+// Generates initial D population.
+dead :: sol;
+dead =  random(nD, 'D') + uniform(0, 'D');
+
+// ---- Age ----
+// Isolation Factor for each age group
+i :: string -> num;
+i 'a' = i_a;
+i 'b' = i_b;
+i 'c' = i_c;
+i 'd' = i_d;
+i 'e' = i_e;
+i 'f' = i_f;
+i 'g' = i_g;
+i 'h' = i_h;
+i 'i' = i_i;
+
+// fraction of severe cases for each age group
+s :: string -> num;
+s 'a' = s_a * con_a;
+s 'b' = s_b * con_b;
+s 'c' = s_c * con_c;
+s 'd' = s_d * con_d;
+s 'e' = s_e * con_e;
+s 'f' = s_f * con_f;
+s 'g' = s_g * con_g;
+s 'h' = s_h * con_h;
+s 'i' = s_i * con_i;
+
+// Fraction of critical cases for each age group
+c :: string -> num;
+c 'a' = c_a;
+c 'b' = c_b;
+c 'c' = c_c;
+c 'd' = c_d;
+c 'e' = c_e;
+c 'f' = c_f;
+c 'g' = c_g;
+c 'h' = c_h;
+c 'i' = c_i;
+
+// Fraction of fatal cases for each age group
+f :: string -> num;
+f 'a' = f_a;
+f 'b' = f_b;
+f 'c' = f_c;
+f 'd' = f_d;
+f 'e' = f_e;
+f 'f' = f_f;
+f 'g' = f_g;
+f 'h' = f_h;
+f 'i' = f_i;
+
+// ---- Basic Parameters ----
+// Mitigation factor
+// Function (input: num (time), output: num (mitigation factor))
+// Right now: no mitigation
+mitigation :: num -> num;
+//mitigation x = 1/(x+1); // mitigation is a continuously decreasing function (m(t)=1/(t+1))
+mitigation x = 1.0; // no mitigation
+
+// Infection rate
+// Function (input: num (time), output: num (infection rate))
+beta :: string -> num -> num;
+beta a x = r_0 * (1.0-i(a)) * mitigation(x) * (1.0 + epsilon * cos(2.0 * pi * ((x + t_start) - t_max) / 365.0)) * (1.0/t_i);
+
+// ++++++++++++++++++++++++++++
+// +++++ Initial solution +++++
+// ++++++++++++++++++++++++++++
+
+>>INIT
+[
+  susceptible('germany') + exposed1() + exposed2() + exposed3() + infected() + recovered() +
+  hospitalized() + critical() + dead() + 0 Bed + 0 Time + 1 Null
+];
+
+// +++++++++++++++++++++++++++++++
+// +++++ Reaction rules ++++++++++
+// +++++++++++++++++++++++++++++++
+
+// R0: Clock (Time in days*100)
+Null -> Null + Time @ 100;
+
+// R1: Infection of susceptible person but without symptoms at first
+S(a):s + I(x):i + Time():t -> E_1(a) + I(x) + Time() @ (beta(a,#t/100.0) / nTotal) * #s * #i;
+
+// R2: Infected person shows symptons and is infectious
+E_1(a):e -> E_2(a) @ (1.0/t_l) * 3 * #e;
+E_2(a):e -> E_3(a) @ (1.0/t_l) * 3 * #e;
+E_3(a):e -> I(a) @ (1.0/t_l) * 3 * #e;
+
+// R3:Hospitalization of infected person
+I(a):i -> H(a) @ (1.0/t_i) * s(a) * #i;
+
+// R4: Recovery of infected person
+I(a):i -> R(a) @ (1.0/t_i) * (1.0-s(a)) * #i;
+
+// R5: Recovery of hospitalized person
+H(a):h -> R(a) @ (1.0/t_h) * (1.0-c(a)) * #h;
+
+// R6: Hospitalized person moves into critical state
+H(a):h -> C(a) + Bed @ (1.0/t_h) * c(a) * #h;
+
+// R7: Hospitalized person moves out of critical state
+C(a):c + Bed -> H(a) @ (1.0/t_c) * (1.0-f(a)) * #c;
+
+// R8: Hospitalized person dies
+C(a):c + Bed:b -> D(a) @ (1.0/t_c) * f(a) * #c * (if (#b <= icu_beds) then 1.0 else severity);
